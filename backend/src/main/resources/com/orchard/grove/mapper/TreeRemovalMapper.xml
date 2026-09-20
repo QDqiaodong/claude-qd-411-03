@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.TreeRemovalMapper">
+    <resultMap id="RemovalMap" type="TreeRemoval">
+        <id column="id" property="id"/>
+        <result column="tree_id" property="treeId"/>
+        <result column="reason" property="reason"/>
+        <result column="prev_status" property="prevStatus"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="withdrawn_at" property="withdrawnAt"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tree_removal (tree_id, reason, prev_status, status, created_at, withdrawn_at)
+        VALUES (#{treeId}, #{reason}, #{prevStatus}, #{status}, #{createdAt}, #{withdrawnAt})
+    </insert>
+    <select id="findActiveByTree" resultMap="RemovalMap">
+        SELECT * FROM tree_removal WHERE tree_id = #{treeId} AND status = '有效'
+        ORDER BY id DESC LIMIT 1
+    </select>
+    <select id="findActive" resultMap="RemovalMap">
+        SELECT * FROM tree_removal WHERE status = '有效'
+    </select>
+    <update id="withdrawById">
+        UPDATE tree_removal SET status = '已撤回', withdrawn_at = #{withdrawnAt}
+        WHERE id = #{id} AND status = '有效'
+    </update>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.PlotMapper">
+    <resultMap id="PlotMap" type="Plot">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="area" property="area"/>
+        <result column="status" property="status"/>
+        <result column="note" property="note"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="PlotMap">
+        SELECT * FROM plot ORDER BY id
+    </select>
+    <select id="findById" resultMap="PlotMap">
+        SELECT * FROM plot WHERE id = #{id}
+    </select>
+    <select id="findByCode" resultMap="PlotMap">
+        SELECT * FROM plot WHERE code = #{code}
+    </select>
+    <select id="countTrees" resultType="int">
+        SELECT COUNT(*) FROM tree WHERE plot_id = #{plotId} AND status &lt;&gt; '已清'
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO plot (code, name, area, status, note)
+        VALUES (#{code}, #{name}, #{area}, #{status}, #{note})
+    </insert>
+    <update id="update">
+        UPDATE plot
+        SET code = #{code}, name = #{name}, area = #{area}, status = #{status}, note = #{note}
+        WHERE id = #{id}
+    </update>
+</mapper>

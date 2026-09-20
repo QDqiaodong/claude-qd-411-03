@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.SprayRecordMapper">
+    <resultMap id="SprayMap" type="SprayRecord">
+        <id column="id" property="id"/>
+        <result column="plot_id" property="plotId"/>
+        <result column="pesticide" property="pesticide"/>
+        <result column="spray_date" property="sprayDate"/>
+        <result column="interval_days" property="intervalDays"/>
+        <result column="status" property="status"/>
+        <result column="note" property="note"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="SprayMap">
+        SELECT * FROM spray_record ORDER BY id DESC
+    </select>
+    <select id="findByPlot" resultMap="SprayMap">
+        SELECT * FROM spray_record WHERE plot_id = #{plotId} ORDER BY id DESC
+    </select>
+    <select id="findById" resultMap="SprayMap">
+        SELECT * FROM spray_record WHERE id = #{id}
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO spray_record (plot_id, pesticide, spray_date, interval_days, status, note)
+        VALUES (#{plotId}, #{pesticide}, #{sprayDate}, #{intervalDays}, #{status}, #{note})
+    </insert>
+    <update id="voidById">
+        UPDATE spray_record SET status = '作废' WHERE id = #{id} AND status = '有效'
+    </update>
+</mapper>

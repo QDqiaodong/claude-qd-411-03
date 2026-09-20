@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.InventoryMapper">
+    <resultMap id="InvMap" type="Inventory">
+        <id column="id" property="id"/>
+        <result column="variety" property="variety"/>
+        <result column="stock_kg" property="stockKg"/>
+        <result column="warn_line" property="warnLine"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="InvMap">
+        SELECT * FROM inventory ORDER BY id
+    </select>
+    <select id="findByVariety" resultMap="InvMap">
+        SELECT * FROM inventory WHERE variety = #{variety}
+    </select>
+    <insert id="upsert">
+        INSERT INTO inventory (variety, stock_kg, warn_line, updated_at)
+        VALUES (#{variety}, 0, #{warnLine}, NOW())
+        ON DUPLICATE KEY UPDATE updated_at = NOW()
+    </insert>
+    <update id="addStock">
+        UPDATE inventory SET stock_kg = stock_kg + #{kg}, updated_at = NOW()
+        WHERE variety = #{variety}
+    </update>
+    <update id="subtractStock">
+        UPDATE inventory SET stock_kg = stock_kg - #{kg}, updated_at = NOW()
+        WHERE variety = #{variety}
+    </update>
+    <update id="update">
+        UPDATE inventory SET stock_kg = #{stockKg}, warn_line = #{warnLine} WHERE id = #{id}
+    </update>
+</mapper>

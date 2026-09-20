@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.TreeMapper">
+    <resultMap id="TreeMap" type="Tree">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="plot_id" property="plotId"/>
+        <result column="variety" property="variety"/>
+        <result column="plant_year" property="plantYear"/>
+        <result column="status" property="status"/>
+        <result column="note" property="note"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="TreeMap">
+        SELECT * FROM tree ORDER BY id
+    </select>
+    <select id="findById" resultMap="TreeMap">
+        SELECT * FROM tree WHERE id = #{id}
+    </select>
+    <select id="findByIdForUpdate" resultMap="TreeMap">
+        SELECT * FROM tree WHERE id = #{id} FOR UPDATE
+    </select>
+    <select id="findByCode" resultMap="TreeMap">
+        SELECT * FROM tree WHERE code = #{code}
+    </select>
+    <select id="countByPlotAndStatus" resultType="int">
+        SELECT COUNT(*) FROM tree WHERE plot_id = #{plotId} AND status = #{status}
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tree (code, plot_id, variety, plant_year, status, note)
+        VALUES (#{code}, #{plotId}, #{variety}, #{plantYear}, #{status}, #{note})
+    </insert>
+    <update id="update">
+        UPDATE tree
+        SET code = #{code}, plot_id = #{plotId}, variety = #{variety},
+            plant_year = #{plantYear}, status = #{status}, note = #{note}
+        WHERE id = #{id}
+    </update>
+    <update id="clearIfNotCleared">
+        UPDATE tree SET status = '已清' WHERE id = #{id} AND status &lt;&gt; '已清'
+    </update>
+    <update id="restoreIfCleared">
+        UPDATE tree SET status = #{status} WHERE id = #{id} AND status = '已清'
+    </update>
+</mapper>

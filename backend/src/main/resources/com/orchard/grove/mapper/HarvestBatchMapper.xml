@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.orchard.grove.mapper.HarvestBatchMapper">
+    <resultMap id="BatchMap" type="HarvestBatch">
+        <id column="id" property="id"/>
+        <result column="plot_id" property="plotId"/>
+        <result column="batch_date" property="batchDate"/>
+        <result column="status" property="status"/>
+        <result column="estimate_kg" property="estimateKg"/>
+        <result column="actual_kg" property="actualKg"/>
+        <result column="variety" property="variety"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="BatchMap">
+        SELECT * FROM harvest_batch ORDER BY id
+    </select>
+    <select id="findById" resultMap="BatchMap">
+        SELECT * FROM harvest_batch WHERE id = #{id}
+    </select>
+    <select id="findByIdForUpdate" resultMap="BatchMap">
+        SELECT * FROM harvest_batch WHERE id = #{id} FOR UPDATE
+    </select>
+    <select id="findByPlotAndDate" resultMap="BatchMap">
+        SELECT * FROM harvest_batch WHERE plot_id = #{plotId} AND batch_date = #{batchDate}
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO harvest_batch (plot_id, batch_date, status, estimate_kg, actual_kg, variety, version)
+        VALUES (#{plotId}, #{batchDate}, #{status}, #{estimateKg}, #{actualKg}, #{variety}, 0)
+    </insert>
+    <update id="update">
+        UPDATE harvest_batch
+        SET plot_id = #{plotId}, batch_date = #{batchDate}, status = #{status},
+            estimate_kg = #{estimateKg}, actual_kg = #{actualKg}, variety = #{variety}
+        WHERE id = #{id}
+    </update>
+    <update id="casUpdate">
+        UPDATE harvest_batch
+        SET plot_id = #{b.plotId}, batch_date = #{b.batchDate}, status = #{b.status},
+            estimate_kg = #{b.estimateKg}, actual_kg = #{b.actualKg}, variety = #{b.variety},
+            version = version + 1
+        WHERE id = #{b.id} AND version = #{version}
+    </update>
+    <select id="findUnstoredByTree" resultMap="BatchMap">
+        SELECT b.* FROM harvest_batch b
+        JOIN batch_tree bt ON bt.batch_id = b.id
+        WHERE bt.tree_id = #{treeId} AND b.status IN ('待采', '采集中')
+        ORDER BY b.id
+    </select>
+    <select id="findTreeIds" resultType="long">
+        SELECT tree_id FROM batch_tree WHERE batch_id = #{batchId} ORDER BY tree_id
+    </select>
+    <insert id="insertBatchTree">
+        INSERT INTO batch_tree (batch_id, tree_id) VALUES (#{batchId}, #{treeId})
+    </insert>
+    <delete id="deleteBatchTrees">
+        DELETE FROM batch_tree WHERE batch_id = #{batchId}
+    </delete>
+</mapper>
